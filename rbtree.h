@@ -19,7 +19,7 @@ struct RBTree{
     int size;
 };
 
-void init_node(struct RBNode* node, int value){
+struct RBNode* init_node(struct RBNode* node, int value){
     struct RBNode* newNode;
     node = (struct RBNode*) malloc(sizeof(struct RBNode));
     node->value = value;
@@ -28,6 +28,8 @@ void init_node(struct RBNode* node, int value){
     node->rightNode = NULL;
     node->colour = 1;
     printf("Reserved?\n");
+
+    return node;
 }
 
 void insert_helper(struct RBNode* node, int value){
@@ -65,10 +67,8 @@ void insert(struct RBTree* tree, int value){
 
     if(tree->root == NULL){
         struct RBNode* node;
-        init_node(node, value);
+        tree->root = init_node(node, value);
         //node->colour = 0;
-        tree->root = node;
-        printf("2222\n");
     }
     else{
         insert_helper(tree->root, value);
