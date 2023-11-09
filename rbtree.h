@@ -3,8 +3,8 @@
 #include <stdbool.h>
 
 enum COLOUR {
-    BLACK,
-    RED
+    BLACK = 0,
+    RED = 1
 };
 
 struct RBNode{
@@ -14,7 +14,7 @@ struct RBNode{
     struct RBNode* leftNode;
     struct RBNode* rightNode;
 
-    // 0 stands for 0, 1 stands for 1
+    // 0 stands for BLACK, 1 stands for RED
     enum COLOUR colour;    
 };
 
@@ -65,7 +65,6 @@ struct RBNode* copy_node(struct RBNode* a, struct RBNode* b){
     return a;
 }
 
-
 void left_rotation(struct RBTree* tri, struct RBNode* x){
     struct RBNode* y = x->rightNode;
     x->rightNode = y->leftNode;
@@ -97,13 +96,13 @@ void right_rotation(struct RBTree* tri, struct RBNode* x){
 void recolour(struct RBTree* tree, struct RBNode* z){
     struct RBNode* y = NULL;
     
-    while(z->parent->colour == 1){
+    while(z->parent->colour == RED){
         if(z->parent == z->parent->parent->leftNode){
             y = z->parent->parent->rightNode;
-            if(y->colour == 1){
-                z->parent->colour = 0;
-                y->colour = 0;
-                z->parent->parent->colour = 1;
+            if(y->colour == RED){
+                z->parent->colour = BLACK;
+                y->colour = BLACK;
+                z->parent->parent->colour = RED;
                 z = z->parent->parent;
             }
             else{
@@ -111,19 +110,17 @@ void recolour(struct RBTree* tree, struct RBNode* z){
                     z = z->parent;
                     left_rotation(tree, z);
                 }
-                z->parent->colour = 0;
-                z->parent->parent->colour = 1;
-                printf("right\n");
+                z->parent->colour = BLACK;
+                z->parent->parent->colour = RED;
                 right_rotation(tree, z->parent->parent);
             }
         }
         else{
-            printf("DEBUG321\n");
             y = z->parent->parent->leftNode;
-            if(y->colour == 1){
-                z->parent->colour = 0;
-                y->colour = 0;
-                z->parent->parent->colour = 1;
+            if(y->colour == RED){
+                z->parent->colour = BLACK;
+                y->colour = BLACK;
+                z->parent->parent->colour = RED;
                 z = z->parent->parent;
             }
             else{
@@ -131,16 +128,14 @@ void recolour(struct RBTree* tree, struct RBNode* z){
                     z = z->parent;
                     right_rotation(tree,z);
                 }
-                z->parent->colour = 0;
-                z->parent->parent->colour = 1;
+                z->parent->colour = BLACK;
+                z->parent->parent->colour = RED;
                 left_rotation(tree,z->parent->parent);
             }
         }
     }
-    tree->root->colour = 0;
+    tree->root->colour = BLACK;
 }
-
-
 
 void insert(struct RBTree* tri, struct RBNode* z){
     struct RBNode* tmp = tri->root;
@@ -164,18 +159,149 @@ void insert(struct RBTree* tri, struct RBNode* z){
     recolour(tri, z);
 }
 
+struct RBNode* minimum(struct RBTree* tri, struct RBNode* node){
+    if(node->leftNode != tri->nullSpace){
+        return minimum(tri, node->leftNode);
+    }
+    return node;
+}
 
+struct RBNode* maximum(struct RBTree* tri, struct RBNode* node){
+    if(node->rightNode != tri->nullSpace){
+        return maximum(tri, node->rightNode);
+    }
+    return node;
+}
 
-void print_inorder_helper(struct RBTree* tree, struct RBNode* node){
-    if(node != tree->nullSpace){
-        print_inorder_helper(tree, node->leftNode);
-        printf("%d|%d\t", node->value, node->colour);
-        print_inorder_helper(tree, node->rightNode);
+void transplant(struct RBTree* tri, struct RBNode* u, struct RBNode* v){
+
+    if (u->parent == tri->nullSpace) tri->root = v;
+    else if (u == u->parent->leftNode) u->parent->leftNode = v;
+    else u->parent->rightNode = v;
+
+    v->parent = u->parent;
+}
+
+void delete_helper(struct RBTree* tri, struct RBNode* x){
+    struct RBNode* w;
+    while(x != tri->root && x->colour == BLACK){
+        if(x == x->parent->leftNode){
+            w = x->parent->rightNode;
+            if (w->colour == RED){
+                w->colour = BLACK;
+                x->parent->colour = RED;
+                left_rotation(tri, x->parent);
+                w = x->parent->rightNode;
+            }
+            if (w->leftNode->colour == BLACK && w->rightNode->colour == BLACK){
+                w->colour = RED;
+                x = x->parent;
+            }
+            else{
+                if (w->rightNode->colour == BLACK){
+                    w->leftNode->colour = BLACK;
+                    w->colour = RED;
+                    right_rotation(tri, w);
+                    w = x->parent->rightNode;
+                }
+                w->colour = x->parent->colour;
+                x->parent->colour = BLACK;
+                w->rightNode->colour = BLACK;
+                left_rotation(tri, x->parent);
+                x = tri->root;
+            }
+        }
+        else{
+            w = x->parent->leftNode;
+            if (w->colour == RED){
+                w->colour = BLACK;
+                x->parent->colour = RED;
+                right_rotation(tri, x->parent);
+                w = x->parent->leftNode;
+            }
+            if (w->rightNode->colour == BLACK && w->leftNode->colour == BLACK){
+                w->colour = RED;
+                x = x->parent;
+            }
+            else{
+                if (w->leftNode->colour == BLACK){
+                    w->rightNode->colour = BLACK;
+                    w->colour = RED;
+                    left_rotation(tri, w);
+                    w = x->parent->leftNode;
+                }
+                w->colour = x->parent->colour;
+                x->parent->colour = BLACK;
+                w->leftNode->colour = BLACK;
+                right_rotation(tri, x->parent);
+                x = tri->root;
+            }
+        }
+    }
+    x->colour = BLACK;
+}
+
+void delete(struct RBTree* tri, struct RBNode* z){
+    struct RBNode* y = z;
+    struct RBNode* x;
+    enum COLOUR originalColour = y->colour;
+    if(z->leftNode == tri->nullSpace){
+        x = z->rightNode;
+        transplant(tri, z, z->rightNode);
+    }
+    else if (z->rightNode == tri->nullSpace){
+        x = z->leftNode;
+        transplant(tri, z, z->leftNode);
+    }
+    else {
+        y = minimum(tri, z->rightNode);
+        originalColour = y->colour;
+        x = y->rightNode;
+        if (y != z->rightNode){
+            transplant(tri, y, y->rightNode);
+            y->rightNode = z->rightNode;
+            y->rightNode->parent = y;
+        }
+        else x->parent = y;
+        transplant(tri, z, y);
+        y->leftNode = z->leftNode;
+        y->leftNode->parent = y;
+        y->colour = z->colour;
+    }
+    if(originalColour == BLACK){
+        delete_helper(tri, x);
     }
 }
 
-void print_inorder(struct RBTree* tree){
-    print_inorder_helper(tree, tree->root);
+
+void print_inorder_helper(struct RBTree* tri, struct RBNode* node){
+    if(node != tri->nullSpace){
+        print_inorder_helper(tri, node->leftNode);
+        if(node->colour) printf("%d|R\t", node->value);
+        else printf("%d|B\t", node->value);
+        print_inorder_helper(tri, node->rightNode);
+    }
+}
+
+void print_inorder(struct RBTree* tri){
+    print_inorder_helper(tri, tri->root);
     printf("\n");
+}
+
+void print_node(struct RBTree* tri, struct RBNode* node){
+    if(node != tri->nullSpace){
+        if(node->colour) printf("---Printing info of node %d|R---\n", node->value);
+        else printf("---Print info of node %d|B---\n", node->value);
+        if(node->leftNode != tri->nullSpace) printf("My left is %d\n", node->leftNode->value);
+        else printf("I have no left\n");
+        if(node->rightNode != tri->nullSpace) printf("My right is %d\n", node->rightNode->value);
+        else printf("I have no right\n");
+        if(node->parent != tri->nullSpace) printf("My parent is %d\n", node->parent->value);
+        else printf("I have no parent\n");
+        
+    }
+    else{
+        printf("Null node");
+    }
 }
 

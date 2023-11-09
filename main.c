@@ -27,6 +27,18 @@ int main(){
     insert(tri, trii);
     print_inorder(tri);
 
-    printf("%d\n", tri->root->value);
+    delete(tri, ocho);
     print_inorder(tri);
+    //testing delete
+    // print_node(tri, tri->root);
+    // print_node(tri, tri->root->rightNode);
+    // print_node(tri, tri->root->rightNode->leftNode);
+    // print_node(tri, tri->root->rightNode->rightNode);
+    // print_node(tri, tri->root->rightNode->leftNode->leftNode);
+
+    //testing minimo
+    // struct RBNode* minimo = minimum(tri, tri->root);
+    // printf("%d\n", minimo->value);
+    // printf("%d\n", tri->root->value);
+    // print_inorder(tri);
 }
