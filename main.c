@@ -2,7 +2,31 @@
 
 
 int main(){
-    struct RBTree tri;
-    insert(&tri, 3);
-    print_inorder(&tri);
+    struct RBTree* tri;
+    tri = init_tree(tri);
+    struct RBNode* four = init_node(4);
+    struct RBNode* two = init_node(2);
+    struct RBNode* uan = init_node(1);
+    struct RBNode* ocho = init_node(8);
+    struct RBNode* nove = init_node(9);
+    struct RBNode* ten = init_node(10);
+    struct RBNode* trii = init_node(3);
+
+    insert(tri, four);
+    print_inorder(tri);
+    insert(tri, two);
+    print_inorder(tri);
+    insert(tri,uan);
+    print_inorder(tri);
+    insert(tri, ocho);
+    print_inorder(tri);
+    insert(tri, nove);
+    print_inorder(tri);
+    insert(tri, ten);
+    print_inorder(tri);
+    insert(tri, trii);
+    print_inorder(tri);
+
+    printf("%d\n", tri->root->value);
+    print_inorder(tri);
 }
