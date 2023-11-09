@@ -7,7 +7,7 @@ enum COLOUR {
     RED = 1
 };
 
-struct thread{
+struct rb_thread{
     int priority;
 
     int thread_id;
@@ -15,21 +15,8 @@ struct thread{
     int secret_code;
 };
 
-struct thread* init_thread(int thread_id, int priority){
-    struct thread* newThread;
-    
-    newThread = (struct thread*) malloc(sizeof(struct thread));
-
-    newThread->thread_id = thread_id;
-    newThread->priority = priority;
-
-    newThread->secret_code = 123456;
-
-    return newThread;
-}
-
 struct RBNode{
-    struct thread* value;
+    struct rb_thread* value;
 
     struct RBNode* parent;
     struct RBNode* leftNode;
@@ -58,7 +45,21 @@ struct RBTree{
 //     return node;
 // }
 
-struct RBNode* init_node_with_thread(struct thread* hilo){
+struct rb_thread* init_rb_thread(int thread_id, int priority){
+    struct rb_thread* newThread;
+    
+    newThread = (struct rb_thread*) malloc(sizeof(struct rb_thread));
+
+    newThread->thread_id = thread_id;
+    newThread->priority = priority;
+
+    newThread->secret_code = 123456;
+
+    return newThread;
+}
+
+
+struct RBNode* init_node_with_thread(struct rb_thread* hilo){
     struct RBNode* node;
     node = (struct RBNode*) malloc(sizeof(struct RBNode));
 
@@ -76,7 +77,7 @@ struct RBTree* init_tree(){
     struct RBTree* tree;
     tree = (struct RBTree*) malloc(sizeof(struct RBTree));
 
-    struct thread* threadNull = init_thread(0,0);
+    struct rb_thread* threadNull = init_rb_thread(0,0);
     struct RBNode* nullspace = init_node_with_thread(threadNull);
     nullspace->colour = BLACK;
 
@@ -172,7 +173,7 @@ void recolour(struct RBTree* tree, struct RBNode* z){
     tree->root->colour = BLACK;
 }
 
-void insert(struct RBTree* tri, struct RBNode* z){
+void rb_insert(struct RBTree* tri, struct RBNode* z){
     struct RBNode* tmp = tri->root;
     struct RBNode* y = tri->nullSpace;
     tri->size += 1;
@@ -217,7 +218,7 @@ void transplant(struct RBTree* tri, struct RBNode* u, struct RBNode* v){
     v->parent = u->parent;
 }
 
-void delete_helper(struct RBTree* tri, struct RBNode* x){
+void rb_delete_helper(struct RBTree* tri, struct RBNode* x){
     struct RBNode* w;
     while(x != tri->root && x->colour == BLACK){
         if(x == x->parent->leftNode){
@@ -276,7 +277,7 @@ void delete_helper(struct RBTree* tri, struct RBNode* x){
     x->colour = BLACK;
 }
 
-void delete(struct RBTree* tri, struct RBNode* z){
+void rb_delete(struct RBTree* tri, struct RBNode* z){
     struct RBNode* y = z;
     struct RBNode* x;
     enum COLOUR originalColour = y->colour;
@@ -307,7 +308,7 @@ void delete(struct RBTree* tri, struct RBNode* z){
         y->colour = z->colour;
     }
     if(originalColour == BLACK){
-        delete_helper(tri, x);
+        rb_delete_helper(tri, x);
     }
 }
 

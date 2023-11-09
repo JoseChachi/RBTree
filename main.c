@@ -5,15 +5,15 @@ int main(){
     struct RBTree* tri;
     tri = init_tree();
 
-    struct thread* hilo5 = init_thread(5, 5);
+    struct rb_thread* hilo5 = init_rb_thread(5, 5);
     struct RBNode* faiv = init_node_with_thread(hilo5);
-    insert(tri, faiv);
-    struct thread* hilo4 = init_thread(4, 4);
+    rb_insert(tri, faiv);
+    struct rb_thread* hilo4 = init_rb_thread(4, 4);
     struct RBNode* four = init_node_with_thread(hilo4);
-    insert(tri, four);
-    struct thread* hilo3 = init_thread(3, 100);
+    rb_insert(tri, four);
+    struct rb_thread* hilo3 = init_rb_thread(3, 100);
     struct RBNode* trii = init_node_with_thread(hilo3);
-    insert(tri, trii);
+    rb_insert(tri, trii);
     print_inorder(tri);
     // struct RBNode* four = init_node(4);
     // struct RBNode* two = init_node(2);
