@@ -10,12 +10,13 @@ enum COLOUR {
     RED = 1
 };
 
-struct rb_thread{
-    int priority;
-
+struct thread{
     int thread_id;
 
-    int secret_code;
+    int virtual_time;
+
+    int priority;
+    struct RBNode* node;
 };
 
 struct RBNode{
@@ -26,7 +27,8 @@ struct RBNode{
     struct RBNode* rightNode;
 
     // 0 stands for BLACK, 1 stands for RED
-    enum COLOUR colour;    
+    enum COLOUR colour;
+    struct thread* thread;
 };
 
 struct RBTree{
@@ -54,6 +56,8 @@ struct RBNode* maximum(struct RBTree* tri, struct RBNode* node);
 void transplant(struct RBTree* tri, struct RBNode* u, struct RBNode* v);
 void rb_delete_helper(struct RBTree* tri, struct RBNode* x);
 void rb_delete(struct RBTree* tri, struct RBNode* z);
+
+struct RBNode* schedule(struct RBTree* tri);
 
 void print_inorder_helper(struct RBTree* tri, struct RBNode* node);
 void print_inorder(struct RBTree* tri);

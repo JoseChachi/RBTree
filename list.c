@@ -2,19 +2,6 @@
 // RBTree
 
 
-struct rb_thread* init_rb_thread(int thread_id, int priority){
-    struct rb_thread* newThread;
-    
-    newThread = (struct rb_thread*) malloc(sizeof(struct rb_thread));
-
-    newThread->thread_id = thread_id;
-    newThread->priority = priority;
-
-    newThread->secret_code = 123456;
-
-    return newThread;
-}
-
 
 struct RBNode* init_node(int priority){
     struct RBNode* node;
@@ -147,7 +134,7 @@ void rb_insert(struct RBTree* tri, struct RBNode* z){
 
     z->leftNode = tri->nullSpace;
     z->rightNode = tri->nullSpace;
-
+    z->colour = RED;
     recolour(tri, z);
 }
 
@@ -268,26 +255,32 @@ void rb_delete(struct RBTree* tri, struct RBNode* z){
     }
 }
 
+struct RBNode* schedule(struct RBTree* tri){
+    struct RBNode* min = minimum(tri,tri->root);
+    rb_delete(tri, min);
+    return min;
+}
+
 
 void print_inorder_helper(struct RBTree* tri, struct RBNode* node){
     if(node != tri->nullSpace){
         print_inorder_helper(tri, node->leftNode);
-        if(node->colour) printf("%d|R\t", node->value);
-        else printf("%d|B\t", node->value);
+        if(node->colour) printf("RED|t_id:%d|%d     ", node->thread->thread_id,node->value);
+        else printf("BLACK|t_id:%d|%d     ", node->thread->thread_id,node->value);
         print_inorder_helper(tri, node->rightNode);
     }
 }
 
 void print_inorder(struct RBTree* tri){
-  printf("---In order tree---\n");
+  printf("\n---In order tree---\n");
   print_inorder_helper(tri, tri->root);
   printf("\n");
 }
 
 void print_node_colour(struct RBTree* tri, struct RBNode* node){
     if(node != tri->nullSpace){
-        if(node->colour) printf("(RED, %d)\n", node->value);
-        else printf("(BLACK, %d)\n", node->value);
+        if(node->colour) printf(" RED|t_id:%d|%d\n",node->thread->thread_id,node->value);
+        else printf(" BLACK|t_id:%d|%d\n",node->thread->thread_id,node->value);
     }
 }
 
@@ -307,7 +300,7 @@ void print_tree_helper(struct RBTree* tri, struct RBNode* node, int depth){
 }
 
 void print_tree(struct RBTree* tri){
-  printf("---Kinda tree---\n");
+  printf("\n---XMAS tree---\n");
   if(tri->root != tri->nullSpace){
     printf("ROOT:");
     print_tree_helper(tri, tri->root, 0);
